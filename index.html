@@ -7,9 +7,9 @@
 :root{--accent:#c9a24b;--bg:#0b0e11;--panel:rgba(15,20,24,.88);--text:#f1ece1;--dim:#a9a396;--border:rgba(201,162,75,.35);}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Segoe UI',Tahoma,sans-serif;color:var(--text)}
 #c{position:fixed;inset:0;z-index:0}
-#hud{position:fixed;top:10px;left:10px;z-index:5;font-size:12px;color:var(--dim);background:rgba(0,0,0,.35);padding:6px 10px;border-radius:6px;display:none;line-height:1.5}
-#prompt{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.55);padding:8px 16px;border-radius:6px;font-size:13px;display:none}
-#crosshair{position:fixed;top:50%;left:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:rgba(255,255,255,.6);z-index:5;display:none}
+#hud{position:fixed;top:10px;left:10px;z-index:5;font-size:12px;color:var(--dim);background:rgba(0,0,0,.5);padding:6px 10px;border-radius:6px;display:none;line-height:1.5}
+#prompt{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.7);color:var(--accent);padding:8px 16px;border-radius:6px;font-size:14px;display:none;border:1px solid var(--border)}
+#crosshair{position:fixed;top:50%;left:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:rgba(255,255,255,.8);z-index:5;display:none;pointer-events:none}
 #loading{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);gap:14px}
 #lbTrack{width:240px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
 #lbFill{width:0;height:100%;background:var(--accent);transition:width .2s}
@@ -66,31 +66,26 @@ select{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(-
 
 <div id="csLayer"><div class="lb" id="lbTop"></div><div class="lb" id="lbBot"></div><div id="csSub"></div><div id="csCard"></div><button id="csSkip">تخطي</button></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/128/examples/js/controls/PointerLockControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ================= CONFIG ================= */
-const GOOGLE_CLIENT_ID="", SUPABASE_URL="", SUPABASE_ANON_KEY="";
 const LEGAL_DOCS={tos:"PLACEHOLDER Terms of Service.",priv:"PLACEHOLDER Privacy Policy.",sup:"PLACEHOLDER support@example.com"};
-const STORY_LOCATIONS={highSchoolName:"PLACEHOLDER_SCHOOL",prisonName:"PLACEHOLDER_PRISON"};
-const ASSET={audio:"/public/audio/",bill:"/public/textures/billboards/",models:"/public/models/"};
 
 /* ================= I18N ================= */
 const I18N={
 ar:{dir:"rtl",loading:"جاري التحميل...",title:"الحي",sub:"CORE BUILD",newGame:"بدء لعبة جديدة",cont:"استمرار اللعب",set:"الإعدادات",sup:"الدعم",priv:"الخصوصية",term:"الشروط",close:"إغلاق",lang:"اللغة",qual:"الجودة",fps:"حد FPS",showfps:"عرض FPS",ctrl:"التحكم",skip:"تخطي",enterCar:"E: دخول السيارة",exitCar:"E: خروج",enterBld:"E: دخول",exitBld:"E: خروج",walk:"سير",drive:"قيادة",
 cs1:"الساعة الواحدة ظهرًا.",cs2:"يتوجه نحو السيارة.",cs3:"الراديو يبث أغنية جزائرية.",cs4:"يتوقف لأخذ ابن عمه.",cs5:"حاجز تفتيش.",cs6:"يعثرون على شيء لا يخصه.",cs7:"بعد خمس سنوات...",cs8:"يخرج من بوابة السجن."},
 en:{dir:"ltr",loading:"Loading...",title:"El-Hay",sub:"CORE BUILD",newGame:"Start New Game",cont:"Continue",set:"Settings",sup:"Support",priv:"Privacy",term:"Terms",close:"Close",lang:"Language",qual:"Quality",fps:"FPS Limit",showfps:"Show FPS",ctrl:"Controls",skip:"Skip",enterCar:"E: Enter Car",exitCar:"E: Exit",enterBld:"E: Enter",exitBld:"E: Exit",walk:"Walking",drive:"Driving",
-cs1:"1:00 PM.",cs2:"He heads to the car.",cs3:"An old Algerian song plays.",cs4:"A stop to pick up his cousin.",cs5:"A checkpoint.",cs6:"They find something that isn't his.",cs7:"Five years later...",cs8:"He walks out the prison gate."},
-fr:{dir:"ltr",loading:"Chargement...",title:"El-Hay",sub:"CORE BUILD",newGame:"Nouvelle partie",cont:"Continuer",set:"Paramètres",sup:"Assistance",priv:"Confidentialité",term:"Conditions",close:"Fermer",lang:"Langue",qual:"Qualité",fps:"Limite FPS",showfps:"Afficher FPS",ctrl:"Contrôles",skip:"Passer",enterCar:"E: Entrer",exitCar:"E: Sortir",enterBld:"E: Entrer",exitBld:"E: Sortir",walk:"Marche",drive:"Conduite",
-cs1:"13h00.",cs2:"Il va vers la voiture.",cs3:"Une vieille chanson passe.",cs4:"Il récupère son cousin.",cs5:"Un barrage.",cs6:"Ils trouvent un objet qui n'est pas à lui.",cs7:"Cinq ans plus tard...",cs8:"Il sort de la prison."},
-zh:{dir:"ltr",loading:"加载中...",title:"El-Hay",sub:"CORE BUILD",newGame:"开始新游戏",cont:"继续",set:"设置",sup:"支持",priv:"隐私",term:"条款",close:"关闭",lang:"语言",qual:"画质",fps:"帧率限制",showfps:"显示FPS",ctrl:"控制",skip:"跳过",enterCar:"E: 上车",exitCar:"E: 下车",enterBld:"E: 进入",exitBld:"E: 离开",walk:"步行",drive:"驾驶",
-cs1:"下午一点。",cs2:"他走向汽车。",cs3:"收音机播放老歌。",cs4:"他去接表弟。",cs5:"检查站。",cs6:"他们发现了不属于他的东西。",cs7:"五年后...",cs8:"他走出监狱大门。"}};
-function t(k){return I18N[S.lang][k]||k}
-function applyLang(){document.documentElement.lang=S.lang;document.documentElement.dir=I18N[S.lang].dir;
- mTitle.textContent=t('title');mSub.textContent=t('sub');bNew.textContent=t('newGame');bCont.textContent=t('cont');bSet.textContent=t('set');
- bSup.textContent=t('sup');bPriv.textContent=t('priv');bTerm.textContent=t('term');sTitle.textContent=t('set');lLang.textContent=t('lang');
- lQual.textContent=t('qual');lFps.textContent=t('fps');lShow.textContent=t('showfps');lCtrl.textContent=t('ctrl');sClose.textContent=t('close');
- lgClose.textContent=t('close');csSkip.textContent=t('skip');localStorage.setItem('elhay_lang',S.lang);}
+cs1:"1:00 PM.",cs2:"He heads to the car.",cs3:"An old Algerian song plays.",cs4:"A stop to pick up his cousin.",cs5:"A checkpoint.",cs6:"They find something that isn't his.",cs7:"Five years later...",cs8:"He walks out the prison gate."}
+};
+function t(k){return (I18N[S.lang]||I18N.ar)[k]||k}
+function applyLang(){
+  document.documentElement.lang=S.lang;document.documentElement.dir=(I18N[S.lang]||I18N.ar).dir;
+  mTitle.textContent=t('title');mSub.textContent=t('sub');bNew.textContent=t('newGame');bCont.textContent=t('cont');bSet.textContent=t('set');
+  bSup.textContent=t('sup');bPriv.textContent=t('priv');bTerm.textContent=t('term');sTitle.textContent=t('set');lLang.textContent=t('lang');
+  lQual.textContent=t('qual');lFps.textContent=t('fps');lShow.textContent=t('showfps');lCtrl.textContent=t('ctrl');sClose.textContent=t('close');
+  lgClose.textContent=t('close');csSkip.textContent=t('skip');localStorage.setItem('elhay_lang',S.lang);
+}
 
 /* ================= SETTINGS ================= */
 const S={lang:localStorage.getItem('elhay_lang')||'ar',qual:localStorage.getItem('elhay_qual')||'med',
@@ -99,7 +94,7 @@ const S={lang:localStorage.getItem('elhay_lang')||'ar',qual:localStorage.getItem
 
 /* ================= DOM ================= */
 const $=id=>document.getElementById(id);
-const canvas=$('c'),hud=$('hud'),promptEl=$('prompt'),crosshair=$('crosshair'),loading=$('loading'),lbFill=$('lbFill'),lbLabel=$('lbLabel');
+const canvas=$('c'),hud=$('hud'),promptEl=$('prompt'),crosshair=$('crosshair'),loading=$('loading'),lbFill=$('lbFill');
 const menu=$('menu'),mTitle=$('mTitle'),mSub=$('mSub'),bNew=$('bNew'),bCont=$('bCont'),bSet=$('bSet'),bSup=$('bSup'),bPriv=$('bPriv'),bTerm=$('bTerm');
 const pSettings=$('pSettings'),sTitle=$('sTitle'),lLang=$('lLang'),lQual=$('lQual'),lFps=$('lFps'),lShow=$('lShow'),lCtrl=$('lCtrl'),sClose=$('sClose');
 const selLang=$('selLang'),selQual=$('selQual'),selFps=$('selFps'),chkFps=$('chkFps'),selCtrl=$('selCtrl');
@@ -116,307 +111,141 @@ scene.background=new THREE.Color(0xbfd4e6);
 scene.fog=new THREE.Fog(0xbfd4e6,60,180);
 const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.1,500);
 const hemi=new THREE.HemisphereLight(0xdfe9f5,0x2a2015,0.7);scene.add(hemi);
-const sun=new THREE.DirectionalLight(0xffe6b8,1.3);sun.position.set(-40,60,-20);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+const sun=new THREE.DirectionalLight(0xffe6b8,1.3);sun.position.set(-40,60,-20);sun.castShadow=true;scene.add(sun);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 
-/* ================= PALETTE TEXTURES (canvas-generated, no external assets needed) ================= */
+/* ================= CAMERA POINTER-LOCK CONTROLLER (INTERNAL) ================= */
+let isLocked = false;
+let yaw = 0, pitch = 0;
+document.addEventListener('pointerlockchange', ()=>{ isLocked = (document.pointerLockElement === document.body); });
+document.addEventListener('mousemove', (e)=>{
+  if(!isLocked) return;
+  yaw -= e.movementX * 0.002;
+  pitch -= e.movementY * 0.002;
+  pitch = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, pitch));
+  camera.rotation.set(0, 0, 0);
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+});
+
+/* ================= PALETTE TEXTURES ================= */
 function canvasTex(draw,w=128,h=128){const cv=document.createElement('canvas');cv.width=w;cv.height=h;draw(cv.getContext('2d'),w,h);
  const tx=new THREE.CanvasTexture(cv);tx.wrapS=tx.wrapT=THREE.RepeatWrapping;return tx;}
 const TEX={
- residential:canvasTex((g,w,h)=>{g.fillStyle='#d8b98a';g.fillRect(0,0,w,h);g.fillStyle='#c79f6b';for(let y=0;y<h;y+=16)g.fillRect(0,y,w,2);
-  g.fillStyle='#8a5a3a';for(let x=8;x<w;x+=24)g.fillRect(x,20,10,14);}),
- retail:canvasTex((g,w,h)=>{g.fillStyle='#e7dcc4';g.fillRect(0,0,w,h);g.fillStyle='#b23a2e';g.fillRect(0,h-28,w,20);
-  g.fillStyle='#fff';g.fillRect(6,h-40,w-12,10);}),
- hospital:canvasTex((g,w,h)=>{g.fillStyle='#f2f6fa';g.fillRect(0,0,w,h);g.fillStyle='#2f6fb0';g.fillRect(0,h-18,w,18);
-  g.fillStyle='#c0392b';g.fillRect(w/2-4,h/2-16,8,32);g.fillRect(w/2-16,h/2-4,32,8);}),
- police:canvasTex((g,w,h)=>{g.fillStyle='#5a5750';g.fillRect(0,0,w,h);g.fillStyle='#3d3a35';for(let y=0;y<h;y+=14)g.fillRect(0,y,w,2);
-  g.fillStyle='#146b3a';g.beginPath();g.arc(w/2,h/2,14,0,7);g.fill();g.fillStyle='#c0392b';g.beginPath();g.arc(w/2,h/2,6,0,7);g.fill();}),
- road:canvasTex((g,w,h)=>{g.fillStyle='#2b2b2e';g.fillRect(0,0,w,h);g.fillStyle='#e7c65a';g.fillRect(w/2-2,0,4,20);g.fillRect(w/2-2,40,4,20);
-  g.fillRect(w/2-2,80,4,20);g.fillRect(w/2-2,120,4,8);},64,128),
- sidewalk:canvasTex((g,w,h)=>{g.fillStyle='#9c988c';g.fillRect(0,0,w,h);g.strokeStyle='#7d7a70';for(let x=0;x<w;x+=16){g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke();}})
+ residential:canvasTex((g,w,h)=>{g.fillStyle='#d8b98a';g.fillRect(0,0,w,h);g.fillStyle='#c79f6b';for(let y=0;y<h;y+=16)g.fillRect(0,y,w,2);}),
+ hospital:canvasTex((g,w,h)=>{g.fillStyle='#f2f6fa';g.fillRect(0,0,w,h);g.fillStyle='#2f6fb0';g.fillRect(0,h-18,w,18);g.fillStyle='#c0392b';g.fillRect(w/2-4,h/2-16,8,32);g.fillRect(w/2-16,h/2-4,32,8);}),
+ police:canvasTex((g,w,h)=>{g.fillStyle='#5a5750';g.fillRect(0,0,w,h);g.fillStyle='#146b3a';g.fillRect(0,0,w,10);}),
+ road:canvasTex((g,w,h)=>{g.fillStyle='#2b2b2e';g.fillRect(0,0,w,h);g.fillStyle='#e7c65a';g.fillRect(w/2-2,0,4,30);g.fillRect(w/2-2,60,4,30);},64,128),
+ sidewalk:canvasTex((g,w,h)=>{g.fillStyle='#9c988c';g.fillRect(0,0,w,h);})
 };
 Object.values(TEX).forEach(tx=>{tx.repeat.set(2,2);});
 
 /* ================= GROUND / ROADS ================= */
 const groundMat=new THREE.MeshStandardMaterial({map:TEX.sidewalk,roughness:1});
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),groundMat);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(1000,1000),groundMat);
 ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
 const roadMat=new THREE.MeshStandardMaterial({map:TEX.road,roughness:0.9});
 function makeRoad(x,z,w,l,rotY){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,l),roadMat);m.rotation.x=-Math.PI/2;m.rotation.z=rotY||0;
  m.position.set(x,0.01,z);m.receiveShadow=true;scene.add(m);}
-for(let i=-4;i<=4;i++){makeRoad(i*40,0,8,2000,0);makeRoad(0,i*40,2000,8,0);}
+makeRoad(0,0,12,1000,0); makeRoad(0,0,1000,12,Math.PI/2);
 
-/* ================= LANDMARK BUILDINGS (distinct, hand-placed) ================= */
-function block(x,y,z,w,h,d,mat,castShadow=true){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y+h/2,z);
- m.castShadow=castShadow;m.receiveShadow=true;scene.add(m);return m;}
-const matRes=new THREE.MeshStandardMaterial({map:TEX.residential,roughness:0.85});
-const matRetail=new THREE.MeshStandardMaterial({map:TEX.retail,roughness:0.85});
-const matHosp=new THREE.MeshStandardMaterial({map:TEX.hospital,roughness:0.6});
-const matPolice=new THREE.MeshStandardMaterial({map:TEX.police,roughness:0.95});
+/* ================= LANDMARKS & CARS ================= */
+function block(x,y,z,w,h,d,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;}
+const matHosp=new THREE.MeshStandardMaterial({map:TEX.hospital});
+const matPolice=new THREE.MeshStandardMaterial({map:TEX.police});
+block(-40,0,-40,16,12,16,matHosp);
+block(40,0,-40,16,10,16,matPolice);
 
-const LANDMARKS={};
-LANDMARKS.hospital=block(-60,0,-60,14,10,14,matHosp);
-LANDMARKS.police=block(60,0,-60,12,9,12,matPolice);
-LANDMARKS.prison=block(30,0,60,18,12,20,matPolice);
-LANDMARKS.home=block(-70,0,-20,8,7,8,matRes);
-LANDMARKS.retail=block(20,0,-20,10,6,10,matRetail);
-
-/* ================= INSTANCED CITY (residential/retail variety, streetlights) ================= */
-const buildingGeo=new THREE.BoxGeometry(6,1,6); // unit box, scaled per-instance
-const buildingMatInst=new THREE.MeshStandardMaterial({map:TEX.residential,roughness:0.85});
-const lampGeo=new THREE.CylinderGeometry(0.08,0.08,3,6);
-const lampMat=new THREE.MeshStandardMaterial({color:0x333,roughness:0.8});
-const lampHeadGeo=new THREE.SphereGeometry(0.18,8,8);
-const lampHeadMat=new THREE.MeshStandardMaterial({color:0xffe9b0,emissive:0xffcf7a,emissiveIntensity:0.6});
-
-const CHUNK=40, RADIUS=3;
-const chunks=new Map();
-function chunkKey(cx,cz){return cx+','+cz;}
-function hash(cx,cz){let h=cx*374761393+cz*668265263;h=(h^(h>>>13))*1274126177;return ((h^(h>>>16))>>>0)/4294967295;}
-
-function buildChunk(cx,cz){
- const group=new THREE.Group();
- const count=6;
- const bMesh=new THREE.InstancedMesh(buildingGeo,buildingMatInst,count);
- bMesh.castShadow=true;bMesh.receiveShadow=true;
- const lampPoles=new THREE.InstancedMesh(lampGeo,lampMat,4);
- const lampHeads=new THREE.InstancedMesh(lampHeadGeo,lampHeadMat,4);
- const dummy=new THREE.Object3D();
- const originX=cx*CHUNK, originZ=cz*CHUNK;
- for(let i=0;i<count;i++){
-  const h=hash(cx*13+i,cz*7+i);
-  const w=4+h*4, ht=5+h*14, d=4+((h*31)%1)*4;
-  const px=originX+(((i%3)-1)*CHUNK/3)+ (h-0.5)*6;
-  const pz=originZ+((Math.floor(i/3)-0.5))*CHUNK/2+(h-0.5)*6;
-  dummy.position.set(px,ht/2,pz);
-  dummy.scale.set(w/6,ht,d/6);
-  dummy.updateMatrix();
-  bMesh.setMatrixAt(i,dummy.matrix);
-  bMesh.setColorAt(i, h>0.5? new THREE.Color(0xd8b98a): new THREE.Color(0xe7dcc4));
- }
- for(let i=0;i<4;i++){
-  const px=originX+(i%2===0?-CHUNK/2+2:CHUNK/2-2), pz=originZ+(i<2?-CHUNK/2+2:CHUNK/2-2);
-  dummy.position.set(px,1.5,pz);dummy.scale.set(1,1,1);dummy.updateMatrix();lampPoles.setMatrixAt(i,dummy.matrix);
-  dummy.position.set(px,3.05,pz);dummy.updateMatrix();lampHeads.setMatrixAt(i,dummy.matrix);
- }
- bMesh.instanceMatrix.needsUpdate=true; if(bMesh.instanceColor) bMesh.instanceColor.needsUpdate=true;
- lampPoles.instanceMatrix.needsUpdate=true; lampHeads.instanceMatrix.needsUpdate=true;
- group.add(bMesh,lampPoles,lampHeads);
- group.userData.cx=cx; group.userData.cz=cz;
- return group;
-}
-function updateChunks(px,pz){
- const ccx=Math.round(px/CHUNK), ccz=Math.round(pz/CHUNK);
- const wanted=new Set();
- for(let dx=-RADIUS;dx<=RADIUS;dx++)for(let dz=-RADIUS;dz<=RADIUS;dz++){
-  const cx=ccx+dx, cz=ccz+dz; if(Math.abs(cx)<1&&Math.abs(cz)<1) continue; // keep spawn/landmark area clear
-  wanted.add(chunkKey(cx,cz));
-  if(!chunks.has(chunkKey(cx,cz))){const g=buildChunk(cx,cz);scene.add(g);chunks.set(chunkKey(cx,cz),g);}
- }
- for(const [key,g] of chunks){ if(!wanted.has(key)){scene.remove(g);chunks.delete(key);} }
-}
-
-/* ================= PLACEHOLDER CUTSCENE PROPS (bed/car/checkpoint/gate) ================= */
-const bedMat=new THREE.MeshStandardMaterial({color:0x8b5e3c});
-const bed=block(-72,0,-22,2,0.6,3,bedMat,false);
-const carBodyMat=new THREE.MeshStandardMaterial({color:0x274b52,metalness:0.4,roughness:0.4});
-const carCabinMat=new THREE.MeshStandardMaterial({color:0x0e1b1d});
-function makeCar(x,z){const g=new THREE.Group();
- const body=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.7,3.6),carBodyMat);body.position.y=0.5;body.castShadow=true;g.add(body);
- const cabin=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.55,1.8),carCabinMat);cabin.position.set(0,1.0,-0.2);g.add(cabin);
- [[-0.9,0.3,1.2],[0.9,0.3,1.2],[-0.9,0.3,-1.2],[0.9,0.3,-1.2]].forEach(p=>{
-  const wheel=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.3,10),new THREE.MeshStandardMaterial({color:0x111}));
-  wheel.rotation.z=Math.PI/2;wheel.position.set(p[0],p[1],p[2]);g.add(wheel);});
- g.position.set(x,0,z);scene.add(g);return g;}
-const playerCar=makeCar(-68,-18);
-for(let i=0;i<5;i++){const c=makeCar(-40+i*20,10);c.rotation.y=Math.random()*Math.PI;} // parked cars, stealable in a later pass
-
-const checkpoint=new THREE.Group();
-const barrier=new THREE.Mesh(new THREE.BoxGeometry(6,0.4,0.4),new THREE.MeshStandardMaterial({color:0xd94b3a}));barrier.position.y=0.6;checkpoint.add(barrier);
-checkpoint.position.set(-20,0,30);scene.add(checkpoint);
-
-/* ================= NPCs ================= */
-const SKIN=[0xC68642,0x8D5524,0xE0AC69,0xF1C27D];
-const OUTFIT=[0x3d5a6c,0x6b4226,0x4a4a48,0x7a5230,0x2f4a3e];
-const npcs=[];
-function spawnNPC(x,z){
- const skin=SKIN[Math.floor(Math.random()*SKIN.length)], outfit=OUTFIT[Math.floor(Math.random()*OUTFIT.length)];
+const carBodyMat=new THREE.MeshStandardMaterial({color:0x274b52});
+function makeCar(x,z){
  const g=new THREE.Group();
- const body=new THREE.Mesh(new THREE.CapsuleGeometry(0.28,0.75,4,8),new THREE.MeshStandardMaterial({color:outfit}));body.position.y=0.9;body.castShadow=true;g.add(body);
- const head=new THREE.Mesh(new THREE.SphereGeometry(0.18,10,10),new THREE.MeshStandardMaterial({color:skin}));head.position.y=1.55;g.add(head);
- g.position.set(x,0,z);scene.add(g);
- npcs.push({mesh:g,dir:Math.random()*Math.PI*2,timer:0});
+ const body=new THREE.Mesh(new THREE.BoxGeometry(2,0.8,4),carBodyMat);body.position.y=0.5;g.add(body);
+ g.position.set(x,0,z);scene.add(g);return g;
 }
-for(let i=0;i<16;i++) spawnNPC((Math.random()-0.5)*140,(Math.random()-0.5)*140);
-function updateNPCs(dt){npcs.forEach(n=>{n.timer-=dt; if(n.timer<=0){n.dir=Math.random()*Math.PI*2;n.timer=2+Math.random()*3;}
- n.mesh.position.x+=Math.sin(n.dir)*dt*1.2; n.mesh.position.z+=Math.cos(n.dir)*dt*1.2; n.mesh.rotation.y=n.dir;});}
+const playerCar=makeCar(-10,10);
 
-/* ================= INTERIORS ================= */
-const interiors={};
-function makeInterior(name,wallColor,floorColor,accent){
- const g=new THREE.Group(); g.visible=false;
- const room=new THREE.Mesh(new THREE.BoxGeometry(10,4,10),new THREE.MeshBasicMaterial({color:wallColor,side:THREE.BackSide}));g.add(room);
- const floor=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.MeshStandardMaterial({color:floorColor}));floor.rotation.x=-Math.PI/2;floor.position.y=-2;g.add(floor);
- if(accent){const a=new THREE.Mesh(new THREE.BoxGeometry(1,1,0.2),new THREE.MeshStandardMaterial({color:accent}));a.position.set(0,0,-4.8);g.add(a);}
- g.position.set(0,50,0); scene.add(g); interiors[name]=g; return g;
-}
-makeInterior('hospital',0xeaf1f8,0xdfe9f2,0xc0392b);
-makeInterior('police',0x3a3733,0x2a2825,0x146b3a);
-makeInterior('prison',0x2c2c2c,0x1f1f1f,0x555);
-makeInterior('home',0xe7d9be,0xc7a97a,0x8a5a3a);
-let activeInterior=null;
-
-const ENTRANCES=[
- {pos:new THREE.Vector3(-60,1,-53),name:'hospital'},
- {pos:new THREE.Vector3(60,1,-54),name:'police'},
- {pos:new THREE.Vector3(30,1,50),name:'prison'},
- {pos:new THREE.Vector3(-70,1,-16),name:'home'},
-];
-function enterInterior(name){
- if(activeInterior) return;
- outsidePos.copy(camera.position);
- Object.values(interiors).forEach(i=>i.visible=false);
- interiors[name].visible=true; activeInterior=name;
- camera.position.set(0,52,3); camera.lookAt(0,51,-4);
-}
-function exitInterior(){ if(!activeInterior) return; interiors[activeInterior].visible=false; activeInterior=null; camera.position.copy(outsidePos); }
-const outsidePos=new THREE.Vector3();
-
-/* ================= PLAYER: WALK / DRIVE ================= */
-const controls=new THREE.PointerLockControls(camera,document.body);
+/* ================= PLAYER / INTERACTIONS ================= */
 camera.position.set(30,1.7,55);
-let mode='walk'; // 'walk' | 'drive'
+let mode='walk';
 const move={f:false,b:false,l:false,r:false};
+
 function bindKeys(){
  const map=()=>S.ctrl==='arrows'?{ArrowUp:'f',ArrowDown:'b',ArrowLeft:'l',ArrowRight:'r'}:{KeyW:'f',KeyS:'b',KeyA:'l',KeyD:'r'};
  addEventListener('keydown',e=>{const m=map();if(m[e.code])move[m[e.code]]=true; if(e.code==='KeyE') tryInteract();});
  addEventListener('keyup',e=>{const m=map();if(m[e.code])move[m[e.code]]=false;});
 }
 bindKeys();
-canvas.addEventListener('click',()=>{ if(menu.style.display==='none' && !document.querySelector('.panel.open') && !csLayer.style.display.match('block')) controls.lock(); });
 
-const carVel={speed:0,steer:0};
+canvas.addEventListener('click',()=>{
+ if(menu.style.display==='none' && !document.querySelector('.panel.open') && csLayer.style.display!=='block') {
+   document.body.requestPointerLock();
+ }
+});
+
 function tryInteract(){
- if(activeInterior){ exitInterior(); return; }
- const p=camera.position;
  if(mode==='walk'){
-  if(p.distanceTo(playerCar.position)<3){ mode='drive'; controls.unlock(); crosshair.style.display='none'; return; }
-  for(const e of ENTRANCES){ if(p.distanceTo(e.pos)<3){ enterInterior(e.name); return; } }
+  if(camera.position.distanceTo(playerCar.position)<4){ mode='drive'; document.exitPointerLock(); crosshair.style.display='none'; }
  } else {
-  mode='walk'; camera.position.set(playerCar.position.x+2,1.7,playerCar.position.z);
+  mode='walk'; camera.position.set(playerCar.position.x+3,1.7,playerCar.position.z);
  }
 }
+
+let carSpeed = 0;
 function updatePlayer(dt){
- if(activeInterior) return;
- if(mode==='walk'){
-  const v=new THREE.Vector3(); if(move.f)v.z-=1; if(move.b)v.z+=1; if(move.l)v.x-=1; if(move.r)v.x+=1;
-  if(v.lengthSq()>0){v.normalize().multiplyScalar(6*dt); controls.moveRight(v.x); controls.moveForward(-v.z);}
-  camera.position.y=1.7;
- } else {
-  if(move.f) carVel.speed=Math.min(carVel.speed+dt*8,14);
-  else if(move.b) carVel.speed=Math.max(carVel.speed-dt*8,-8);
-  else carVel.speed*=0.94;
-  if(move.l) carVel.steer=Math.min(carVel.steer+dt*2,1);
-  else if(move.r) carVel.steer=Math.max(carVel.steer-dt*2,-1);
-  else carVel.steer*=0.85;
-  playerCar.rotation.y+=carVel.steer*dt*(carVel.speed/14);
-  playerCar.position.x+=Math.sin(playerCar.rotation.y)*carVel.speed*dt;
-  playerCar.position.z+=Math.cos(playerCar.rotation.y)*carVel.speed*dt;
-  const camOff=new THREE.Vector3(0,2.4,6).applyAxisAngle(new THREE.Vector3(0,1,0),playerCar.rotation.y);
-  camera.position.copy(playerCar.position).add(camOff);
-  camera.lookAt(playerCar.position.x,playerCar.position.y+1,playerCar.position.z);
+ if(mode==='walk' && isLocked){
+  const dir = new THREE.Vector3();
+  if(move.f) dir.z -= 1; if(move.b) dir.z += 1;
+  if(move.l) dir.x -= 1; if(move.r) dir.x += 1;
+  dir.normalize(); dir.applyAxisAngle(new THREE.Vector3(0,1,0), yaw);
+  camera.position.addScaledVector(dir, 8 * dt);
+  camera.position.y = 1.7;
+ } else if(mode==='drive'){
+  if(move.f) carSpeed = Math.min(carSpeed + dt*10, 15);
+  else if(move.b) carSpeed = Math.max(carSpeed - dt*10, -5);
+  else carSpeed *= 0.95;
+
+  if(move.l) playerCar.rotation.y += dt * 1.5;
+  if(move.r) playerCar.rotation.y -= dt * 1.5;
+
+  playerCar.position.x += Math.sin(playerCar.rotation.y) * carSpeed * dt;
+  playerCar.position.z += Math.cos(playerCar.rotation.y) * carSpeed * dt;
+
+  camera.position.set(playerCar.position.x - Math.sin(playerCar.rotation.y)*7, playerCar.position.y + 3, playerCar.position.z - Math.cos(playerCar.rotation.y)*7);
+  camera.lookAt(playerCar.position);
  }
 }
+
 function updatePrompt(){
- if(activeInterior){promptEl.textContent=t('exitBld');promptEl.style.display='block';return;}
- const p=camera.position; let shown=false;
  if(mode==='walk'){
-  if(p.distanceTo(playerCar.position)<3){promptEl.textContent=t('enterCar');shown=true;}
-  else for(const e of ENTRANCES) if(p.distanceTo(e.pos)<3){promptEl.textContent=t('enterBld');shown=true;break;}
- } else { promptEl.textContent=t('exitCar'); shown=true; }
- promptEl.style.display=shown?'block':'none';
+  if(camera.position.distanceTo(playerCar.position)<4){ promptEl.textContent=t('enterCar'); promptEl.style.display='block'; }
+  else promptEl.style.display='none';
+ } else {
+  promptEl.textContent=t('exitCar'); promptEl.style.display='block';
+ }
 }
-
-/* ================= QUALITY ================= */
-function applyQuality(){
- const m={low:{pr:1,sh:false,fog:200},med:{pr:1.5,sh:true,fog:150},high:{pr:2,sh:true,fog:120},ultra:{pr:2,sh:true,fog:80}}[S.qual]||{};
- renderer.setPixelRatio(Math.min(devicePixelRatio,m.pr)); renderer.shadowMap.enabled=m.sh; scene.fog.far=m.fog;
-}
-
-/* ================= CUTSCENE (condensed) ================= */
-const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
-const BEATS=[
- {from:{p:V3(-75,1.6,-22),l:V3(-72,1.2,-22)},to:{p:V3(-70,1.6,-22),l:V3(-72,1,-22)},dur:3,sub:'cs1'},
- {from:{p:V3(-70,1.6,-22),l:V3(-72,1,-22)},to:{p:V3(-66,1.7,-18),l:V3(-68,0.8,-18)},dur:3,sub:'cs2'},
- {from:{p:V3(-60,2.2,-10),l:V3(-30,1,0)},to:{p:V3(-20,2.2,20),l:V3(-10,1,30)},dur:4.5,sub:'cs3'},
- {from:{p:V3(-24,2,26),l:V3(-20,1,30)},to:{p:V3(-18,2,28),l:V3(-20,1,30)},dur:3,sub:'cs4'},
- {from:{p:V3(-16,1.6,29),l:V3(-19,1,30)},to:{p:V3(-19,1.4,30.5),l:V3(-20,1,30.5)},dur:3.5,sub:'cs5'},
- {from:{p:V3(-19,1.4,30.5),l:V3(-20,1,30.5)},to:{p:V3(-21,1.3,31),l:V3(-22,1,31)},dur:3.5,sub:'cs6'},
- {card:'cs7',dur:2.2},
- {from:{p:V3(30,1.7,66),l:V3(30,1.4,60)},to:{p:V3(30,1.7,58),l:V3(30,1.4,55)},dur:3.5,sub:'cs8'}
-];
-let csSkipped=false;
-csSkip.addEventListener('click',()=>csSkipped=true);
-const lerpV=(a,b,x)=>a.clone().lerp(b,x);
-function wait(ms){return new Promise(r=>setTimeout(r,ms));}
-async function playBeat(b){
- if(csSkipped)return;
- if(b.card){csSub.textContent='';csCard.textContent=t(b.card);csCard.classList.add('show');await wait(b.dur*1000);csCard.classList.remove('show');return;}
- csSub.textContent=t(b.sub);
- const start=performance.now(), dur=b.dur*1000;
- return new Promise(res=>{function step(){ if(csSkipped)return res();
-  const x=Math.min((performance.now()-start)/dur,1);
-  camera.position.copy(lerpV(b.from.p,b.to.p,x)); camera.lookAt(lerpV(b.from.l,b.to.l,x));
-  if(x<1)requestAnimationFrame(step);else res();} step();});
-}
-async function playCutscene(){
- csSkipped=false; csLayer.style.display='block'; controls.unlock();
- for(const b of BEATS){ if(csSkipped)break; await playBeat(b); }
- csLayer.style.display='none'; csSub.textContent=''; csCard.classList.remove('show');
- camera.position.set(30,1.7,55); camera.lookAt(30,1.4,40);
- mode='walk'; hud.style.display=S.showFps?'block':'none'; crosshair.style.display='block';
-}
-
-/* ================= MULTIPLAYER FOUNDATION (stub only) ================= */
-const NetworkManager={ ws:null,
- connect(url){ try{ this.ws=new WebSocket(url); this.ws.onmessage=e=>this.onMessage(JSON.parse(e.data)); }catch(e){console.warn('NetworkManager: no server configured yet',e);} },
- send(type,payload){ if(this.ws&&this.ws.readyState===1) this.ws.send(JSON.stringify({type,payload})); },
- onMessage(msg){ /* route: 'pvp','respawn','heist','role' etc. — wired once a server exists */ }
-};
 
 /* ================= UI WIRING ================= */
 selLang.value=S.lang;selQual.value=S.qual;selFps.value=String(S.fpsLimit);chkFps.checked=S.showFps;selCtrl.value=S.ctrl;
-applyLang(); applyQuality(); hud.style.display=S.showFps?'block':'none';
+applyLang(); hud.style.display=S.showFps?'block':'none';
 selLang.onchange=e=>{S.lang=e.target.value;applyLang();};
-selQual.onchange=e=>{S.qual=e.target.value;localStorage.setItem('elhay_qual',S.qual);applyQuality();};
-selFps.onchange=e=>{S.fpsLimit=parseInt(e.target.value);localStorage.setItem('elhay_fps',S.fpsLimit);};
-chkFps.onchange=e=>{S.showFps=e.target.checked;localStorage.setItem('elhay_showfps',S.showFps);hud.style.display=S.showFps?'block':'none';};
-selCtrl.onchange=e=>{S.ctrl=e.target.value;localStorage.setItem('elhay_ctrl',S.ctrl);};
 bSet.onclick=()=>pSettings.classList.add('open'); sClose.onclick=()=>pSettings.classList.remove('open');
-function legal(titleKey,body){lgTitle.textContent=t(titleKey);lgBody.textContent=body;pLegal.classList.add('open');}
-bSup.onclick=()=>legal('sup',LEGAL_DOCS.sup); bPriv.onclick=()=>legal('priv',LEGAL_DOCS.priv); bTerm.onclick=()=>legal('term',LEGAL_DOCS.tos);
-lgClose.onclick=()=>pLegal.classList.remove('open');
-bNew.onclick=()=>{menu.style.display='none';playCutscene();};
-bCont.onclick=()=>{ if(!localStorage.getItem('elhay_save')) return; menu.style.display='none'; crosshair.style.display='block'; hud.style.display=S.showFps?'block':'none'; };
+bNew.onclick=()=>{menu.style.display='none'; crosshair.style.display='block'; document.body.requestPointerLock();};
+bCont.onclick=()=>{menu.style.display='none'; crosshair.style.display='block'; document.body.requestPointerLock();};
 
 /* ================= MAIN LOOP ================= */
-let last=performance.now(), fpsAcc=0, fpsCount=0, fpsSample=performance.now();
+let last=performance.now(), fpsCount=0, fpsSample=performance.now();
 function loop(now){
  requestAnimationFrame(loop);
- const targetMs=S.fpsLimit>0?1000/S.fpsLimit:0;
- const elapsed=now-last; if(elapsed<targetMs) return;
- const dt=Math.min(elapsed/1000,0.1); last=now;
- updatePlayer(dt); updateNPCs(dt); updatePrompt();
- updateChunks(camera.position.x,camera.position.z);
+ const dt=Math.min((now-last)/1000, 0.1); last=now;
+ updatePlayer(dt); updatePrompt();
  renderer.render(scene,camera);
- fpsCount++; if(now-fpsSample>=500){ if(S.showFps) hud.textContent='FPS: '+Math.round(fpsCount*1000/(now-fpsSample))+'\n'+ (mode==='drive'?t('drive'):t('walk')); fpsCount=0; fpsSample=now; }
+ fpsCount++; if(now-fpsSample>=500){ if(S.showFps) hud.textContent='FPS: '+Math.round(fpsCount*1000/(now-fpsSample)); fpsCount=0; fpsSample=now; }
 }
 requestAnimationFrame(loop);
 
 /* ================= BOOT ================= */
-updateChunks(0,0);
-let pct=0; const bootId=setInterval(()=>{ pct+=10+Math.random()*10; lbFill.style.width=Math.min(pct,100)+'%';
- if(pct>=100){ clearInterval(bootId); setTimeout(()=>{ loading.style.display='none'; menu.style.display='flex'; },200);} },100);
+let pct=0; const bootId=setInterval(()=>{ pct+=20; lbFill.style.width=pct+'%';
+ if(pct>=100){ clearInterval(bootId); loading.style.display='none'; menu.style.display='flex'; } },80);
 </script>
 </body>
 </html>
